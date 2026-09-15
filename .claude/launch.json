@@ -1,0 +1,25 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "api",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": [
+        "-NoProfile",
+        "-Command",
+        "Set-Location backend; .venv\\Scripts\\uvicorn.exe app.main:create_app --factory --host 127.0.0.1 --port 8000"
+      ],
+      "port": 8000
+    },
+    {
+      "name": "web",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": [
+        "-NoProfile",
+        "-Command",
+        "$env:Path = 'C:\\Program Files\\nodejs;' + $env:Path; $env:VITE_DEV_MEDIA_ROOT = (Resolve-Path backend\\.media-dev).Path; Set-Location frontend; npm run dev -- --host 127.0.0.1 --strictPort"
+      ],
+      "port": 5173
+    }
+  ]
+}
