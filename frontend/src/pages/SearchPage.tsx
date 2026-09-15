@@ -7,7 +7,7 @@ import { ErrorMessage } from "../components/ErrorMessage";
 import { MultiSelect } from "../components/MultiSelect";
 import { Pagination } from "../components/Pagination";
 import { StatusBadge } from "../components/StatusBadge";
-import { STATUS_LABELS, availability, formatTimestampDate } from "../lib/format";
+import { STATUS_LABELS, availability, formatDateTime, formatTimestampDate } from "../lib/format";
 import { PAGE_SIZE, activeFilterCount, readSearchParams, writeSearchParams } from "./search/params";
 
 const SORT_LABELS: Record<SortOption, string> = {
@@ -257,6 +257,7 @@ export function SearchPage() {
               <th>Занятость</th>
               <th>Риелтор</th>
               <th>Добавлена</th>
+              <th>Изменена</th>
             </tr>
           </thead>
           <tbody ref={rows}>
@@ -294,6 +295,16 @@ export function SearchPage() {
                   </td>
                   <td data-label="Риелтор">{item.created_by_name}</td>
                   <td data-label="Добавлена">{formatTimestampDate(item.created_at)}</td>
+                  <td data-label="Изменена" className="col-changed">
+                    {item.updated_at ? (
+                      <>
+                        {formatDateTime(item.updated_at)}
+                        <span className="changed-by">{item.updated_by_name}</span>
+                      </>
+                    ) : (
+                      <span className="muted">—</span>
+                    )}
+                  </td>
                 </tr>
               );
             })}

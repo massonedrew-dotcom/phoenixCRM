@@ -114,6 +114,8 @@ export interface PropertyListItem {
   occupied_until: string | null;
   created_by_name: string;
   created_at: string;
+  updated_by_name: string | null;
+  updated_at: string | null;
   cover_thumb_url: string | null;
   media_count: number;
 }
@@ -139,6 +141,37 @@ export interface AuditEntry {
   user: UserRef | null;
   ip: string | null;
   created_at: string;
+  property_id?: string | null;
+  property_code?: number | null;
+  subject_name?: string | null;
+}
+
+export interface UserViewSummary {
+  user_id: string;
+  full_name: string;
+  username: string;
+  role: Role;
+  is_active: boolean;
+  views: number;
+  cards: number;
+  last_viewed_at: string;
+}
+
+export interface ViewEntry {
+  id: number;
+  viewed_at: string;
+  user: UserRef;
+  property: { id: string; code: number; landmark: string };
+  ip: string | null;
+}
+
+export interface ViewFilter {
+  user_id?: string;
+  property_code?: number;
+  date_from?: string;
+  date_to?: string;
+  page?: number;
+  page_size?: number;
 }
 
 export interface SearchParams {
@@ -160,6 +193,7 @@ export interface AuditFilter {
   entity?: string;
   action?: AuditAction;
   user_id?: string;
+  property_code?: number;
   date_from?: string;
   date_to?: string;
   page?: number;

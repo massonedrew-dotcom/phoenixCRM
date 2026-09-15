@@ -91,6 +91,16 @@ screens behind login still need a manual pass.
 - [x] 9.3 `README.md`: install on a bare server, install on a VPS
 - [x] 9.4 Structured logging, error handling, 500 page
 
+## Stage 10 — Oversight
+- [x] 10.1 `property_views` journal: card opens with 10-minute de-duplication
+- [x] 10.2 `GET /views/summary`, `GET /views` for admin and head
+- [x] 10.3 Audit feed names the card number and changed user or district;
+      filter by card number
+- [x] 10.4 Search list shows who changed a card last and when
+- [x] 10.5 Tests: journaling, de-duplication, append-only, permissions, periods
+- [ ] 10.6 Admin UI: «Просмотры» tab, readable «Журнал изменений»; last change in
+      search and card header (type-checked and built; not clicked through)
+
 ## Later (not MVP — keep the architecture open for these)
 - Sales module via `deal_type = 'sale'`
 - Tenant search requests and matching against the base

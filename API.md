@@ -91,7 +91,7 @@ Deleted cards never appear in `GET /properties`.
 
 Response items are trimmed for the list view: id, code, district name, landmark,
 interest_status, free_until, occupied_until, created_by name, created_at,
-cover thumbnail URL, media_count.
+updated_by name, updated_at, cover thumbnail URL, media_count.
 
 ### POST / PATCH /properties — request body
 
@@ -191,11 +191,27 @@ PATCH  /districts/{id}          admin  {name, is_active}
 ## Audit
 
 ```
-GET /audit?entity=&entity_id=&user_id=&action=&date_from=&date_to=&page=&page_size=
+GET /audit?entity=&entity_id=&user_id=&action=&property_code=&date_from=&date_to=&page=&page_size=
 ```
 
 Admin and head see everything. Agents may read history of any single property
 through `/properties/{id}/history` but cannot query the global audit feed.
+
+Feed entries additionally carry `property_id` and `property_code` (the card a
+property or media row belongs to) and `subject_name` (the changed user or
+district). `property_code` filters the card's own rows and its media rows.
+
+## Views (admin and head)
+
+```
+GET /views/summary?date_from=&date_to=      -> [{user_id, full_name, username, role, is_active, views, cards, last_viewed_at}]
+GET /views?user_id=&property_code=&date_from=&date_to=&page=&page_size=
+    -> Page of {id, viewed_at, user: {id, full_name}, property: {id, code, landmark}, ip}
+```
+
+Every successful `GET /properties/{id}` writes a view (D27); reopening the same
+card within 10 minutes is not written again. Search, history, and media
+requests are not views. Agents get 403.
 
 ## Client config
 

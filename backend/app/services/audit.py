@@ -36,6 +36,9 @@ def to_entries(rows: Sequence[Row]) -> list[AuditEntry]:
                 ),
                 ip=str(log.ip) if log.ip is not None else None,
                 created_at=log.created_at,
+                property_id=getattr(row, "property_id", None),
+                property_code=getattr(row, "property_code", None),
+                subject_name=getattr(row, "subject_name", None),
             )
         )
     return entries
@@ -52,6 +55,7 @@ async def audit_feed(
     entity_id: uuid.UUID | None = None,
     user_id: uuid.UUID | None = None,
     action: AuditAction | None = None,
+    property_code: int | None = None,
     date_from: date | None = None,
     date_to: date | None = None,
 ) -> Page[AuditEntry]:
@@ -63,6 +67,7 @@ async def audit_feed(
         entity_id=entity_id,
         user_id=user_id,
         action=action,
+        property_code=property_code,
         created_from=day_start(date_from, settings.zone) if date_from else None,
         created_before=day_after(date_to, settings.zone) if date_to else None,
     )

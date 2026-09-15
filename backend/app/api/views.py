@@ -5,39 +5,45 @@ from typing import Annotated
 from fastapi import APIRouter, Query
 
 from app.core.dependencies import HeadOrAdminDep, SessionDep, SettingsDep
-from app.core.enums import AuditAction, AuditEntity
-from app.schemas.audit import AuditEntry
 from app.schemas.common import DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE, Page
-from app.services import audit as audit_service
+from app.schemas.views import UserViewSummary, ViewEntry
+from app.services import views as views_service
 
-router = APIRouter(prefix="/audit", tags=["audit"])
+router = APIRouter(prefix="/views", tags=["views"])
 
 
-@router.get("", response_model=Page[AuditEntry])
-async def audit_feed(
+@router.get("/summary", response_model=list[UserViewSummary])
+async def view_summary(
     actor: HeadOrAdminDep,
     session: SessionDep,
     settings: SettingsDep,
-    entity: AuditEntity | None = None,
-    entity_id: uuid.UUID | None = None,
+    date_from: date | None = None,
+    date_to: date | None = None,
+) -> list[UserViewSummary]:
+    return await views_service.view_summary(
+        session, settings, actor, date_from=date_from, date_to=date_to
+    )
+
+
+@router.get("", response_model=Page[ViewEntry])
+async def list_views(
+    actor: HeadOrAdminDep,
+    session: SessionDep,
+    settings: SettingsDep,
     user_id: uuid.UUID | None = None,
-    action: AuditAction | None = None,
     property_code: Annotated[int | None, Query(ge=1)] = None,
     date_from: date | None = None,
     date_to: date | None = None,
     page: Annotated[int, Query(ge=1)] = 1,
     page_size: Annotated[int, Query(ge=1, le=MAX_PAGE_SIZE)] = DEFAULT_PAGE_SIZE,
-) -> Page[AuditEntry]:
-    return await audit_service.audit_feed(
+) -> Page[ViewEntry]:
+    return await views_service.list_views(
         session,
         settings,
         actor,
         page=page,
         page_size=page_size,
-        entity=entity.value if entity else None,
-        entity_id=entity_id,
         user_id=user_id,
-        action=action,
         property_code=property_code,
         date_from=date_from,
         date_to=date_to,

@@ -1,9 +1,10 @@
 import { useMemo } from "react";
 
 import { useDistricts, usePropertyHistory } from "../../api/hooks";
-import type { AuditEntry, InterestStatus } from "../../api/types";
+import type { AuditEntry } from "../../api/types";
 import { ErrorMessage } from "../../components/ErrorMessage";
-import { ACTION_LABELS, FIELD_LABELS, STATUS_LABELS, formatDate, formatDateTime, formatMoney } from "../../lib/format";
+import { formatAuditValue } from "../../lib/auditValues";
+import { ACTION_LABELS, FIELD_LABELS, formatDateTime } from "../../lib/format";
 
 /** Rows written by one operation (same entity, action, user, and moment) shown together. */
 interface HistoryGroup {
@@ -44,26 +45,8 @@ export function HistoryTab({ propertyId }: { propertyId: string }) {
     return names;
   }, [history.data]);
 
-  const formatValue = (field: string | null, value: string | null): string => {
-    if (value === null || value === "") return "—";
-    switch (field) {
-      case "district_id":
-        return districtNames.get(value) ?? "район удалён из справочника";
-      case "interest_status":
-        return STATUS_LABELS[value as InterestStatus] ?? value;
-      case "free_until":
-      case "occupied_until":
-        return formatDate(value);
-      case "price":
-        return `${formatMoney(value)} у.е.`;
-      case "kind":
-        return value === "video" ? "видео" : "фото";
-      case "property_id":
-        return "эта карточка";
-      default:
-        return value;
-    }
-  };
+  const formatValue = (field: string | null, value: string | null): string =>
+    formatAuditValue(field, value, districtNames);
 
   const describe = (group: HistoryGroup): string => {
     const { first } = group;

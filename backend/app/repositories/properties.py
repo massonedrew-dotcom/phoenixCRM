@@ -231,6 +231,8 @@ def build_search_statement(criteria: SearchCriteria) -> Select[tuple[object, ...
         .scalar_subquery()
     )
     media_count = select(func.count(PropertyMedia.id)).where(_active_media()).scalar_subquery()
+    creator = aliased(User)
+    editor = aliased(User)
     details = (
         select(
             page.c.id,
@@ -243,13 +245,16 @@ def build_search_statement(criteria: SearchCriteria) -> Select[tuple[object, ...
             Property.interest_status,
             Property.free_until,
             Property.occupied_until,
-            User.full_name.label("created_by_name"),
+            creator.full_name.label("created_by_name"),
+            Property.updated_at,
+            editor.full_name.label("updated_by_name"),
             cover_media_id.label("cover_media_id"),
             media_count.label("media_count"),
         )
         .join_from(page, Property, Property.id == page.c.id)
         .join(District, District.id == Property.district_id)
-        .join(User, User.id == Property.created_by)
+        .join(creator, creator.id == Property.created_by)
+        .outerjoin(editor, editor.id == Property.updated_by)
         .subquery("details")
     )
     totals = select(func.count().label("total")).select_from(filtered).subquery("totals")

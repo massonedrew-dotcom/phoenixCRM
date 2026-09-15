@@ -60,6 +60,15 @@ export function PropertyPage() {
           Карточка № {property.data.code}
           <span className="card-subtitle"> · {property.data.district.name}</span>
         </h1>
+        <p className="last-change">
+          {property.data.updated_by
+            ? `Последнее изменение: ${property.data.updated_by.full_name}, ${formatDateTime(property.data.updated_at)}`
+            : `Создана: ${property.data.created_by.full_name}, ${formatDateTime(property.data.created_at)}`}
+          {" · "}
+          <button type="button" className="link-button" onClick={() => setTab("history")}>
+            вся история
+          </button>
+        </p>
       </div>
       <div className="tabs" role="tablist">
         <button type="button" role="tab" aria-selected={tab === "data"} className={tab === "data" ? "tab active" : "tab"} onClick={() => setTab("data")}>

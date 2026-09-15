@@ -5,21 +5,25 @@ import { AuditTab } from "./admin/AuditTab";
 import { DeletedTab } from "./admin/DeletedTab";
 import { DistrictsTab } from "./admin/DistrictsTab";
 import { UsersTab } from "./admin/UsersTab";
+import { ViewsTab } from "./admin/ViewsTab";
 
-type AdminTab = "users" | "districts" | "deleted" | "audit";
+type AdminTab = "users" | "audit" | "views" | "districts" | "deleted";
 
 const TAB_LABELS: Record<AdminTab, string> = {
   users: "Пользователи",
+  audit: "Журнал изменений",
+  views: "Просмотры",
   districts: "Районы",
   deleted: "Удалённые карточки",
-  audit: "Журнал",
 };
 
 export function AdminPage() {
   const user = useCurrentUser();
   const [url, setUrl] = useSearchParams();
   const tabs: AdminTab[] =
-    user.role === "admin" ? ["users", "districts", "deleted", "audit"] : ["users", "deleted", "audit"];
+    user.role === "admin"
+      ? ["users", "audit", "views", "districts", "deleted"]
+      : ["users", "audit", "views", "deleted"];
   const requested = url.get("tab") as AdminTab | null;
   const tab: AdminTab = requested && tabs.includes(requested) ? requested : "users";
 
@@ -41,9 +45,10 @@ export function AdminPage() {
         ))}
       </div>
       {tab === "users" && <UsersTab canManage={user.role === "admin"} currentUserId={user.id} />}
+      {tab === "audit" && <AuditTab />}
+      {tab === "views" && <ViewsTab />}
       {tab === "districts" && <DistrictsTab />}
       {tab === "deleted" && <DeletedTab />}
-      {tab === "audit" && <AuditTab />}
     </div>
   );
 }

@@ -158,3 +158,16 @@ that is rolled back.
 
 **D26. Health endpoint.** `GET /api/v1/health`; `503 {"status":"error","db":"error"}`
 when the database is unreachable.
+
+## Protection against copying the base
+
+**D27. View journal, no limits.** Anyone who can see a card can copy it by hand,
+so copying cannot be prevented outright; it is made visible instead. Every
+successful card open is written to `property_views` (who, which card, when, IP);
+reopening the same card within 10 minutes counts once. Admin and head see, per
+day or period, how many distinct cards each user opened and the exact list.
+The product owner chose not to block or rate-limit realtors; there is still no
+export anywhere, and the search list does not include owner phones. Changes
+remain in `audit_log`; the global journal now names the card number and the
+changed user or district, and the search list shows who changed a card last and
+when, so every realtor sees recent edits without opening the history.

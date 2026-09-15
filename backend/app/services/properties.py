@@ -26,6 +26,7 @@ from app.schemas.properties import (
     PropertyRead,
 )
 from app.services import media as media_service
+from app.services import views as views_service
 from app.services.audit import to_entries
 from app.services.base import apply_patch
 from app.services.dates import day_after, day_start, local_today
@@ -89,6 +90,15 @@ async def get_property(
         ),
         can_edit=not record.is_deleted and can_edit_property(actor, record.created_by),
     )
+
+
+async def open_property(
+    session: AsyncSession, settings: Settings, actor: Actor, property_id: uuid.UUID
+) -> PropertyRead:
+    """A user opens a card: return it and write the view journal."""
+    detail = await get_property(session, settings, actor, property_id)
+    await views_service.record_property_view(session, actor, property_id)
+    return detail
 
 
 async def create_property(
@@ -212,6 +222,8 @@ def _list_item(settings: Settings, row: Row) -> PropertyListItem:
         occupied_until=row.occupied_until,
         created_by_name=row.created_by_name,
         created_at=row.created_at,
+        updated_by_name=row.updated_by_name,
+        updated_at=row.updated_at,
         cover_thumb_url=(
             media_service.media_url(settings, row.cover_media_id, "thumb")
             if row.cover_media_id is not None

@@ -22,6 +22,9 @@ import type {
   Role,
   SearchParams,
   User,
+  UserViewSummary,
+  ViewEntry,
+  ViewFilter,
 } from "./types";
 
 export const queryKeys = {
@@ -35,6 +38,8 @@ export const queryKeys = {
   history: (id: string) => ["properties", "history", id] as const,
   deleted: (page: number) => ["properties", "deleted", page] as const,
   audit: (filter: AuditFilter) => ["audit", filter] as const,
+  viewSummary: (from?: string, to?: string) => ["views", "summary", from, to] as const,
+  views: (filter: ViewFilter) => ["views", "list", filter] as const,
 };
 
 const REFERENCE_STALE_MS = 5 * 60 * 1000;
@@ -258,5 +263,28 @@ export function useUpdateDistrict() {
     mutationFn: ({ id, patch }: { id: string; patch: Partial<Pick<District, "name" | "is_active">> }) =>
       request<District>(`/districts/${id}`, { method: "PATCH", json: patch }),
     onSuccess: async () => client.invalidateQueries({ queryKey: queryKeys.districts }),
+  });
+}
+
+export function useViewSummary(
+  dateFrom: string | undefined,
+  dateTo: string | undefined,
+): UseQueryResult<UserViewSummary[]> {
+  return useQuery({
+    queryKey: queryKeys.viewSummary(dateFrom, dateTo),
+    queryFn: () =>
+      request<UserViewSummary[]>("/views/summary", {
+        query: { date_from: dateFrom, date_to: dateTo },
+      }),
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useViews(filter: ViewFilter, enabled = true): UseQueryResult<Page<ViewEntry>> {
+  return useQuery({
+    queryKey: queryKeys.views(filter),
+    queryFn: () => request<Page<ViewEntry>>("/views", { query: { ...filter } }),
+    placeholderData: keepPreviousData,
+    enabled,
   });
 }

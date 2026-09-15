@@ -80,7 +80,7 @@ async def list_deleted_properties(
 async def get_property(
     property_id: uuid.UUID, actor: ActorDep, session: SessionDep, settings: SettingsDep
 ) -> PropertyRead:
-    return await properties_service.get_property(session, settings, actor, property_id)
+    return await properties_service.open_property(session, settings, actor, property_id)
 
 
 @router.post("", response_model=PropertyRead, status_code=status.HTTP_201_CREATED)

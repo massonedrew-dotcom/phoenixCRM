@@ -321,6 +321,8 @@ async def test_list_item_shape(
         "occupied_until",
         "created_by_name",
         "created_at",
+        "updated_by_name",
+        "updated_at",
         "cover_thumb_url",
         "media_count",
     }

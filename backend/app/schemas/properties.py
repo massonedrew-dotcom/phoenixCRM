@@ -139,6 +139,8 @@ class PropertyListItem(BaseModel):
     occupied_until: date | None
     created_by_name: str
     created_at: datetime
+    updated_by_name: str | None
+    updated_at: datetime | None
     cover_thumb_url: str | None
     media_count: int
 

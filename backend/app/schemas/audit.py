@@ -17,3 +17,8 @@ class AuditEntry(BaseModel):
     user: UserRef | None
     ip: str | None
     created_at: datetime
+    # Filled in the global journal: the card a property or media row belongs to,
+    # and the name of a changed user or district.
+    property_id: uuid.UUID | None = None
+    property_code: int | None = None
+    subject_name: str | None = None

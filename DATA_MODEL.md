@@ -83,6 +83,18 @@ There is no currency column: prices are always у.е. (D1).
 | uploaded_by | uuid FK users.id not null | |
 | uploaded_at | timestamptz not null default now() | |
 
+### property_views
+| column | type | notes |
+|--------|------|-------|
+| id | bigserial PK | |
+| property_id | uuid FK properties.id not null | |
+| user_id | uuid FK users.id not null | |
+| viewed_at | timestamptz not null default now() | |
+| ip | inet nullable | |
+
+Append-only journal of card opens (D27); a trigger rejects UPDATE and DELETE.
+A repeat open of the same card by the same user within 10 minutes is not written.
+
 ### audit_log
 | column | type | notes |
 |--------|------|-------|
@@ -124,6 +136,9 @@ CREATE INDEX idx_media_property       ON property_media (property_id, sort_order
 CREATE INDEX idx_audit_entity         ON audit_log (entity, entity_id, created_at DESC);
 CREATE INDEX idx_audit_user           ON audit_log (user_id, created_at DESC);
 CREATE INDEX idx_auth_sessions_user   ON auth_sessions (user_id);
+CREATE INDEX idx_views_user           ON property_views (user_id, viewed_at DESC);
+CREATE INDEX idx_views_property       ON property_views (property_id, viewed_at DESC);
+CREATE INDEX idx_views_time           ON property_views (viewed_at DESC);
 ```
 
 The trigram indexes on `owner_phone_digits` and `request_no` serve the

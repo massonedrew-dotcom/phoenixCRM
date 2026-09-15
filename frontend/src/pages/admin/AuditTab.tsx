@@ -1,24 +1,66 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { useAuditFeed, useRealtors } from "../../api/hooks";
-import type { AuditAction, AuditFilter } from "../../api/types";
+import { useAuditFeed, useDistricts, useRealtors } from "../../api/hooks";
+import type { AuditAction, AuditEntry, AuditFilter } from "../../api/types";
 import { ErrorMessage } from "../../components/ErrorMessage";
 import { Pagination } from "../../components/Pagination";
+import { formatAuditValue } from "../../lib/auditValues";
 import { ACTION_LABELS, ENTITY_LABELS, FIELD_LABELS, formatDateTime } from "../../lib/format";
 
 const PAGE_SIZE = 50;
 
 export function AuditTab() {
   const [filter, setFilter] = useState<AuditFilter>({ page: 1, page_size: PAGE_SIZE });
+  const [cardCode, setCardCode] = useState("");
   const feed = useAuditFeed(filter);
   const realtors = useRealtors();
+  const districts = useDistricts();
+  const districtNames = useMemo(
+    () => new Map((districts.data ?? []).map((d) => [d.id, d.name])),
+    [districts.data],
+  );
 
   const change = (changes: Partial<AuditFilter>) => setFilter({ ...filter, ...changes, page: 1 });
+
+  const subject = (entry: AuditEntry) => {
+    if (entry.property_id && entry.property_code) {
+      const label = entry.entity === "media" ? "Файл карточки" : "Карточка";
+      return (
+        <>
+          {label} <Link to={`/properties/${entry.property_id}`}>№ {entry.property_code}</Link>
+        </>
+      );
+    }
+    const kind = ENTITY_LABELS[entry.entity] ?? entry.entity;
+    return entry.subject_name ? `${kind}: ${entry.subject_name}` : kind;
+  };
+
+  const changeText = (entry: AuditEntry): string => {
+    if (entry.field === null) return "";
+    if (entry.field === "password") return "пароль изменён";
+    const field = FIELD_LABELS[entry.field] ?? entry.field;
+    const newValue = formatAuditValue(entry.field, entry.new_value, districtNames);
+    if (entry.action === "create" || entry.action === "login_failed") return `${field}: ${newValue}`;
+    return `${field}: ${formatAuditValue(entry.field, entry.old_value, districtNames)} → ${newValue}`;
+  };
 
   return (
     <section>
       <div className="filters">
+        <label className="inline-field">
+          <span>Карточка №</span>
+          <input
+            className="narrow-input"
+            inputMode="numeric"
+            value={cardCode}
+            onChange={(e) => {
+              const digits = e.target.value.replace(/\D/g, "");
+              setCardCode(digits);
+              change({ property_code: digits ? Number(digits) : undefined });
+            }}
+          />
+        </label>
         <label className="inline-field">
           <span>Объект</span>
           <select value={filter.entity ?? ""} onChange={(e) => change({ entity: e.target.value || undefined })}>
@@ -45,7 +87,7 @@ export function AuditTab() {
           </select>
         </label>
         <label className="inline-field">
-          <span>Пользователь</span>
+          <span>Кто</span>
           <select value={filter.user_id ?? ""} onChange={(e) => change({ user_id: e.target.value || undefined })}>
             <option value="">все</option>
             {(realtors.data ?? []).map((user) => (
@@ -72,9 +114,8 @@ export function AuditTab() {
               <th>Когда</th>
               <th>Кто</th>
               <th>Действие</th>
-              <th>Объект</th>
-              <th>Поле</th>
-              <th>Было → стало</th>
+              <th>Что</th>
+              <th>Изменение</th>
               <th>IP</th>
             </tr>
           </thead>
@@ -84,28 +125,18 @@ export function AuditTab() {
                 <td data-label="Когда" className="nowrap">
                   {formatDateTime(entry.created_at)}
                 </td>
-                <td data-label="Кто">{entry.user?.full_name ?? "—"}</td>
+                <td data-label="Кто">{entry.user?.full_name ?? (entry.action === "login_failed" ? "неизвестно" : "система")}</td>
                 <td data-label="Действие">{ACTION_LABELS[entry.action]}</td>
-                <td data-label="Объект">
-                  {entry.entity === "property" && entry.entity_id ? (
-                    <Link to={`/properties/${entry.entity_id}`}>{ENTITY_LABELS.property}</Link>
-                  ) : (
-                    (ENTITY_LABELS[entry.entity] ?? entry.entity)
-                  )}
-                </td>
-                <td data-label="Поле">{entry.field ? (FIELD_LABELS[entry.field] ?? entry.field) : "—"}</td>
-                <td data-label="Было → стало" className="audit-values">
-                  {entry.field === "password"
-                    ? "изменён"
-                    : entry.field
-                      ? `${entry.old_value ?? "—"} → ${entry.new_value ?? "—"}`
-                      : ""}
+                <td data-label="Что">{subject(entry)}</td>
+                <td data-label="Изменение" className="audit-values">
+                  {changeText(entry)}
                 </td>
                 <td data-label="IP">{entry.ip ?? "—"}</td>
               </tr>
             ))}
           </tbody>
         </table>
+        {feed.data && feed.data.total === 0 && <p className="empty">Записей нет.</p>}
       </div>
       {feed.data && (
         <Pagination

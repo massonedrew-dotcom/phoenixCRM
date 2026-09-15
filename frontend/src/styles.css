@@ -1072,7 +1072,7 @@ td {
   }
 
   .results .col-thumb {
-    grid-row: span 6;
+    grid-row: span 8;
     padding: 2px 0;
     width: auto;
   }
@@ -1109,5 +1109,64 @@ td {
 
   .results-meta {
     flex-wrap: wrap;
+  }
+}
+
+/* Admin: views and journal */
+.narrow-input {
+  width: 90px;
+}
+
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.strong {
+  font-weight: 600;
+}
+
+.admin-table tr.clickable {
+  cursor: pointer;
+}
+
+.admin-table tr.clickable:hover,
+.admin-table tr.selected {
+  background: var(--accent-soft);
+}
+
+.section-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  margin: 18px 0 8px;
+}
+
+.col-changed {
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.changed-by {
+  display: block;
+  color: var(--muted);
+}
+
+.last-change {
+  flex-basis: 100%;
+  margin: -4px 0 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+@media (max-width: 760px) {
+  .changed-by {
+    display: inline;
+    margin-left: 6px;
+  }
+
+  .num {
+    text-align: left;
   }
 }
