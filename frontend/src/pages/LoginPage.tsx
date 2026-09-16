@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
 import { useAuth } from "../auth/AuthContext";
+import { DEMO } from "../components/DemoBanner";
 import { ErrorMessage } from "../components/ErrorMessage";
 
 export function LoginPage() {
@@ -34,7 +35,11 @@ export function LoginPage() {
     <div className="login-page">
       <form className="login-card" onSubmit={submit}>
         <h1>База объектов</h1>
-        <p className="muted">Войдите, чтобы искать и редактировать карточки</p>
+        <p className="muted">
+          {DEMO
+            ? "Демонстрационная версия. Логины: admin, head, dilnoza, rustam. Пароль любой."
+            : "Войдите, чтобы искать и редактировать карточки"}
+        </p>
         <label className="field">
           <span>Логин</span>
           <input
@@ -53,7 +58,7 @@ export function LoginPage() {
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
+            required={!DEMO}
           />
         </label>
         <ErrorMessage error={error} />

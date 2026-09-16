@@ -29,6 +29,8 @@ function serveAccelRedirect(accelPath: string, contentType: string, res: ServerR
 }
 
 export default defineConfig({
+  // GitHub Pages serves the demo from /<repository>/; the app build uses the site root.
+  base: process.env.VITE_BASE ?? "/",
   plugins: [react()],
   server: {
     port: 5173,

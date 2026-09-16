@@ -1,23 +1,14 @@
+import { ApiError, type FieldError } from "./errors";
+
+export { ApiError };
+export type { FieldError };
+
 const API_BASE = "/api/v1";
 const REFRESH_TOKEN_KEY = "crm.refreshToken";
 
-export interface FieldError {
-  field: string;
-  message: string;
-}
-
-export class ApiError extends Error {
-  readonly status: number;
-  readonly code: string;
-  readonly fieldErrors: FieldError[];
-
-  constructor(status: number, code: string, message: string, fieldErrors: FieldError[] = []) {
-    super(message);
-    this.status = status;
-    this.code = code;
-    this.fieldErrors = fieldErrors;
-  }
-}
+/** The GitHub Pages build answers requests from a demo database in the browser. */
+const DEMO = import.meta.env.VITE_DEMO === "1";
+const demoApi = () => import("../demo/api");
 
 let accessToken: string | null = null;
 let refreshInFlight: Promise<boolean> | null = null;
@@ -53,7 +44,8 @@ export const session = {
     writeRefreshToken(null);
   },
   hasRefreshToken(): boolean {
-    return readRefreshToken() !== null;
+    // In the demo the session lives in the demo database, not in a token.
+    return DEMO || readRefreshToken() !== null;
   },
   onAuthLost(listener: () => void): void {
     authLostListener = listener;
@@ -64,6 +56,9 @@ export const session = {
 export function refreshAccessToken(): Promise<boolean> {
   if (refreshInFlight === null) {
     refreshInFlight = (async () => {
+      if (DEMO) {
+        return (await demoApi()).demoHasSession();
+      }
       const refreshToken = readRefreshToken();
       if (refreshToken === null) {
         return false;
@@ -201,6 +196,9 @@ async function send(path: string, options: RequestOptions): Promise<Response> {
 }
 
 export async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  if (DEMO) {
+    return (await demoApi()).demoRequest<T>(path, options);
+  }
   let response = await send(path, options);
   if (response.status === 401 && session.hasRefreshToken()) {
     if (await refreshAccessToken()) {
@@ -226,6 +224,10 @@ export function upload<T>(
   form: FormData,
   onProgress: (fraction: number) => void,
 ): Promise<T> {
+  if (DEMO) {
+    onProgress(1);
+    return demoApi().then((api) => api.demoUpload<T>(path, form));
+  }
   const attempt = (): Promise<{ status: number; text: string }> =>
     new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();

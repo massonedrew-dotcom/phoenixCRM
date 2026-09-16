@@ -1170,3 +1170,18 @@ td {
     text-align: left;
   }
 }
+
+/* Demo build */
+.demo-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background: #fff7e6;
+  border-bottom: 1px solid #f3d9a4;
+  color: #7c5306;
+  font-size: 13px;
+  text-align: center;
+}

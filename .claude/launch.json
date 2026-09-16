@@ -20,6 +20,16 @@
         "$env:Path = 'C:\\Program Files\\nodejs;' + $env:Path; $env:VITE_DEV_MEDIA_ROOT = (Resolve-Path backend\\.media-dev).Path; Set-Location frontend; npm run dev -- --host 127.0.0.1 --strictPort"
       ],
       "port": 5173
+    },
+    {
+      "name": "demo",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": [
+        "-NoProfile",
+        "-Command",
+        "$env:Path = 'C:\\Program Files\\nodejs;' + $env:Path; Set-Location frontend; npx vite preview --port 4173 --strictPort --base /phoenixCRM/"
+      ],
+      "port": 4173
     }
   ]
 }

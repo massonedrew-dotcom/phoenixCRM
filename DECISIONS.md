@@ -171,3 +171,12 @@ export anywhere, and the search list does not include owner phones. Changes
 remain in `audit_log`; the global journal now names the card number and the
 changed user or district, and the search list shows who changed a card last and
 when, so every realtor sees recent edits without opening the history.
+
+**D28. Demo build for GitHub Pages.** A link to show the product was needed, and
+GitHub Pages serves static files only. `VITE_DEMO=1` swaps the API client for
+`src/demo/`, an in-browser stand-in that keeps generated cards, media, audit rows,
+and views in localStorage and repeats the server's rules (role permissions, soft
+delete, audit, view journal). It is a demonstration, not a security boundary:
+without a server there is nothing to check a password against, so the demo signs in
+by username alone and says so on the login screen. The production build is
+unchanged and still talks to the real API.

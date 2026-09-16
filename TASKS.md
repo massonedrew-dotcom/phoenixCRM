@@ -101,6 +101,13 @@ screens behind login still need a manual pass.
 - [ ] 10.6 Admin UI: «Просмотры» tab, readable «Журнал изменений»; last change in
       search and card header (type-checked and built; not clicked through)
 
+## Stage 11 — Demo link
+- [x] 11.1 In-browser demo API with generated data (`frontend/src/demo/`)
+- [x] 11.2 Demo banner, login hint, reset button
+- [x] 11.3 GitHub Pages workflow publishing the demo on every push to main
+- [x] 11.4 Checked in a browser: login, search with a typo, card edit, history,
+      journal, views
+
 ## Later (not MVP — keep the architecture open for these)
 - Sales module via `deal_type = 'sale'`
 - Tenant search requests and matching against the base

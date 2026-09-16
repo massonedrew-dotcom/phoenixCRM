@@ -4,6 +4,7 @@ import { NavLink } from "react-router-dom";
 import { useAuth, useCurrentUser } from "../auth/AuthContext";
 import { ROLE_LABELS } from "../lib/format";
 import { ChangePasswordDialog } from "./ChangePasswordDialog";
+import { DemoBanner } from "./DemoBanner";
 
 export function Layout({ children }: { children: ReactNode }) {
   const user = useCurrentUser();
@@ -38,6 +39,7 @@ export function Layout({ children }: { children: ReactNode }) {
           </button>
         </div>
       </header>
+      <DemoBanner />
       <main className="content">{children}</main>
       {changingPassword && <ChangePasswordDialog onClose={() => setChangingPassword(false)} />}
     </div>

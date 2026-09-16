@@ -53,7 +53,8 @@ const router = createBrowserRouter(
     ],
   },
   ],
-  { future: FUTURE_FLAGS },
+  // React Router needs the base without a trailing slash ("/phoenixCRM", not "/phoenixCRM/").
+  { future: FUTURE_FLAGS, basename: import.meta.env.BASE_URL.replace(/\/$/, "") },
 );
 
 export function App() {
